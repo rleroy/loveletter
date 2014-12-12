@@ -27,5 +27,6 @@ public class BattlenetAPIChecker {
     @Then("^I get data$")
     public void i_get_data() throws Throwable {
         Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getJSON());
     }
 }
