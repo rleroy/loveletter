@@ -18,15 +18,21 @@ public class BattlenetAPIChecker {
     private BattleNetClient client;
     private BattleNetResponse response;
     
+    private String realm;
     private String guild;
     private Set<WowGuildMember> members;
 
     private String name;
     private WowCharacter character;
     
-    @Given("^a battlenet client on server \"(.*?)\"/\"(.*?)\"$")
-    public void a_battlenet_client_on_server(String zone, String server) throws Throwable {
-        client = new BattleNetClient(zone, server);
+    @Given("^a battlenet client on zone \"(.*?)\"$")
+    public void a_battlenet_client_on_zone(String zone) throws Throwable {
+        client = new BattleNetClient(zone);
+    }
+
+    @Given("^realm name is \"(.*?)\"$")
+    public void server_name_is(String realm) throws Throwable {
+        this.realm = realm;
     }
 
     @Given("^guild name is \"(.*?)\"$")
@@ -41,17 +47,17 @@ public class BattlenetAPIChecker {
 
     @When("^I request data$")
     public void i_request_data() throws Throwable {
-        response = client.getData("guild", "La Meute");
+        response = client.getData("guild", "Sargeras", "La Meute");
     }
 
     @When("^I get the member list$")
     public void i_get_the_member_list() throws Throwable {
-        this.members = client.getGuild(this.guild).getMembers();
+        this.members = client.getGuild(this.realm, this.guild).getMembers();
     }
     
     @When("^I get the character data$")
     public void i_get_the_character_data() throws Throwable {
-        this.character = client.getCharacter(name);
+        this.character = client.getCharacter(this.realm, name);
     }
     
     @Then("^I get data$")

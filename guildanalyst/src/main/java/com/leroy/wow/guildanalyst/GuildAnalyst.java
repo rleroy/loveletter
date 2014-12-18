@@ -9,12 +9,12 @@ import com.leroy.wow.beans.WowGuild;
 public class GuildAnalyst {
     
     public static void main(String...args) throws Throwable{
-        BattleNetClient client = new BattleNetClient("EU", "Sargeras");
-        WowGuild guild = client.getGuild("La Meute");
+        BattleNetClient client = new BattleNetClient("EU");
+        WowGuild guild = client.getGuild("Sargeras", "La Meute");
         
         guild.getMembers()
             .stream()
-            .map(m -> client.getSafeCharacter(m.getName()))
+            .map(m -> client.getSafeCharacter(m.getRealm(), m.getName()))
             .filter(c -> c != null)
             .sorted(Comparator.comparingLong(WowCharacter::getAverageItemLevelEquipped).reversed())
             .forEach(c -> System.out.println(c.getName() + "->" + c.getAverageItemLevelEquipped()));
