@@ -10,6 +10,8 @@ public class WowCharacter {
     private String realm;
     private String battlegroup;
     
+    private Long achievementPoints;
+    
     private Long averageItemLevel;
     private Long averageItemLevelEquipped;
     
@@ -22,6 +24,7 @@ public class WowCharacter {
         name = (String)obj.get("name");
         realm = (String)obj.get("realm");
         battlegroup = (String)obj.get("battlegroup");
+        achievementPoints = (Long)obj.get("achievementPoints");
         
         JSONObject items = (JSONObject)obj.get("items");
         if (items != null){
@@ -52,6 +55,10 @@ public class WowCharacter {
 
     public Long getAverageItemLevelEquipped() {
         return averageItemLevelEquipped;
+    }
+
+    public Long getAchievementPoints() {
+        return achievementPoints;
     }
 
 }

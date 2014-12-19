@@ -7,6 +7,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +18,9 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.leroy.wow.battlenet.services.BattleNetClientCacheService;
+import com.leroy.wow.battlenet.services.BattleNetClientPersistenceService;
+import com.leroy.wow.battlenet.services.BattleNetClientWebService;
 import com.leroy.wow.beans.WowCharacter;
 import com.leroy.wow.beans.WowGuild;
 
@@ -21,55 +28,59 @@ import com.leroy.wow.beans.WowGuild;
 public class BattleNetClient {
 
     private final static Logger logger = Logger.getLogger(BattleNetClient.class);
-
-    private String host;
+    private long apiCallCount;
+    
+    private BattleNetClientWebService web;
+    private BattleNetClientPersistenceService file;
+    private BattleNetClientCacheService mem;
     
     public BattleNetClient(String zone) {
-        if ("EU".equals(zone)){
-            this.host = "eu.battle.net";
-        }else{
-            throw new IllegalArgumentException("Zone "+zone+" is not supported");
-        }
+        this.apiCallCount = 0;
+        this.web = new BattleNetClientWebService(zone);
+        this.file = new BattleNetClientPersistenceService("/users/leroyro1/perso/tmp", LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT), Duration.ofHours(1));
+        this.mem = new BattleNetClientCacheService();
+
         System.setProperty("http.proxyHost", "proxyusers.intranet");
         System.setProperty("http.proxyPort", "8080");
         System.setProperty("http.proxyUser", "leroyro1");
     }
 
-    public BattleNetResponse getData(String type, String realm, String name) throws IOException, URISyntaxException{
-        return this.getData(type, realm, name, null);
+    public long getApiCallCount() {
+        return apiCallCount;
     }
     
-    public BattleNetResponse getData(String type, String realm, String name, Set<String> fields) throws IOException, URISyntaxException{
-        String path = "/api/wow/"+type+"/"+realm+"/"+name;
-        String options = null;
-        if (fields != null && fields.size() > 0){
-            List<String> optionsList = fields.stream().map(s -> "fields=" + s).collect(Collectors.toList());
-            options = String.join("&", optionsList); 
+    public boolean isPersisted(BattleNetType type, String realm, String name) {
+        boolean res = false;
+        try{
+            res = file.getData(type, realm, name) != null;
+        }catch(Exception e){
+            logger.error("Cannot check persistency of "+type.name()+" whith name "+name+" on realm "+realm);
+            logger.debug(e.getMessage(), e);
         }
-        URI uri = new URI("http", host, path, options, null);
-        URL url = uri.toURL();
-        URLConnection conn = url.openConnection();
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String data = "";
-        String inputLine;
-        while ((inputLine = br.readLine()) != null) {
-            data += inputLine;
+        return res;
+    }
+    
+    public BattleNetResponse getData(BattleNetType type, String realm, String name) throws IOException, URISyntaxException{
+        BattleNetResponse res = mem.getData(type, realm, name);
+        if (res == null){
+            res = file.getData(type, realm, name);
+            if (res == null){
+                res = web.getData(type, realm, name);
+                apiCallCount++;
+                file.putData(type, realm, name, res.getJSON());
+            }
+            mem.putData(type, realm, name, res.getJSON());
         }
-        br.close();
-        return new BattleNetResponse(data);
+        return res;
     }
 
     public WowGuild getGuild(String realm, String name) throws Exception{
-        Set<String> fields = new HashSet<String>();
-        fields.add("members");
-        BattleNetResponse data = this.getData("guild", realm, name, fields);
+        BattleNetResponse data = this.getData(BattleNetType.guild, realm, name);
         return new WowGuild(data.getJSON());
     }
 
     public WowCharacter getCharacter(String realm, String name) throws IOException, URISyntaxException {
-        Set<String> fields = new HashSet<String>();
-        fields.add("items");
-        BattleNetResponse data = this.getData("character", realm, name, fields);
+        BattleNetResponse data = this.getData(BattleNetType.character, realm, name);
         return new WowCharacter(data.getJSON());
     }
 

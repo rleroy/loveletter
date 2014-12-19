@@ -19,3 +19,11 @@ Given realm name is "Sargeras"
 Given character name is "Pamynx"
  When I get the character data
  Then I am able to know the ilvl of this character 
+ Then I am able to know the achievementPoints of this character 
+
+Scenario: Character data
+Given realm name is "Sargeras"
+Given character name is "Aphykith"
+ When I get the character data
+ Then I am able to know this character is a reroll of "Pamynx" 
+ 

@@ -1,11 +1,13 @@
 package com.leroy.wow.guildanalyst.glue.battlenet;
 
+import java.io.File;
 import java.util.Set;
 
 import org.junit.Assert;
 
 import com.leroy.wow.battlenet.BattleNetClient;
 import com.leroy.wow.battlenet.BattleNetResponse;
+import com.leroy.wow.battlenet.BattleNetType;
 import com.leroy.wow.beans.WowCharacter;
 import com.leroy.wow.beans.WowGuildMember;
 
@@ -44,10 +46,18 @@ public class BattlenetAPIChecker {
     public void character_name_is(String character) throws Throwable {
         this.name = character;
     }
+    
+    @Given("^required data exists in the file system$")
+    public void required_data_exists_in_the_file_system() throws Throwable {
+        File f = new File("/users/leroyro1/perso/tmp/character/Sargeras/Pamynx.json");
+        if (!f.exists()){
+            f.createNewFile();
+        }
+    }
 
     @When("^I request data$")
     public void i_request_data() throws Throwable {
-        response = client.getData("guild", "Sargeras", "La Meute");
+        response = client.getData(BattleNetType.guild, "Sargeras", "La Meute");
     }
 
     @When("^I get the member list$")
@@ -57,7 +67,7 @@ public class BattlenetAPIChecker {
     
     @When("^I get the character data$")
     public void i_get_the_character_data() throws Throwable {
-        this.character = client.getCharacter(this.realm, name);
+        this.character = client.getCharacter(realm, name);
     }
     
     @Then("^I get data$")
@@ -74,5 +84,31 @@ public class BattlenetAPIChecker {
     @Then("^I am able to know the ilvl of this character$")
     public void i_am_able_to_know_the_ilvl_of_this_character() throws Throwable {
         Assert.assertNotNull(this.character.getAverageItemLevel());
+    }
+    
+    @Then("^I am able to know the achievementPoints of this character$")
+    public void i_am_able_to_know_the_achievementPoints_of_this_character() throws Throwable {
+        Assert.assertNotNull(this.character.getAchievementPoints());
+    }
+    
+    @Then("^I am able to know this character is a reroll of \"(.*?)\"$")
+    public void i_am_able_to_know_this_character_is_a_reroll_of(String main) throws Throwable {
+        // TODO 
+        //Assert.assertEquals(main, this.character.getMainCharacter().getName());
+    }
+    
+    @Then("^the API was only called once$")
+    public void the_API_was_only_called_once() throws Throwable {
+        Assert.assertTrue(client.getApiCallCount() <= 1);
+    }
+
+    @Then("^the API was never called$")
+    public void the_API_was_never_called() throws Throwable {
+        Assert.assertTrue(client.getApiCallCount() == 0);
+    }
+
+    @Then("^data for the character has been saved in the file system$")
+    public void data_has_been_saved_in_the_file_system() throws Throwable {
+        Assert.assertTrue(client.isPersisted(BattleNetType.character, realm, name));
     }
 }
