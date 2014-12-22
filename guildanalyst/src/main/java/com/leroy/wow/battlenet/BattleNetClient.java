@@ -1,20 +1,11 @@
 package com.leroy.wow.battlenet;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
@@ -35,14 +26,21 @@ public class BattleNetClient {
     private BattleNetClientCacheService mem;
     
     public BattleNetClient(String zone) {
+    	String persistentPath = "/tmp";
+    	if ("leroyro1".equals(System.getProperty("user.name"))){
+            System.setProperty("http.proxyHost", "proxyusers.intranet");
+            System.setProperty("http.proxyPort", "8080");
+            System.setProperty("http.prox yUser", "leroyro1");
+            persistentPath = "/users/leroyro1/perso/tmp";
+    	}else{
+    		persistentPath = "/Volumes/SeagateUSBDrive/Ronan/wow/tmp";
+    	}
+    	
         this.apiCallCount = 0;
         this.web = new BattleNetClientWebService(zone);
-        this.file = new BattleNetClientPersistenceService("/users/leroyro1/perso/tmp", LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT), Duration.ofHours(1));
+        this.file = new BattleNetClientPersistenceService(persistentPath, LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT), Duration.ofHours(1));
         this.mem = new BattleNetClientCacheService();
 
-        System.setProperty("http.proxyHost", "proxyusers.intranet");
-        System.setProperty("http.proxyPort", "8080");
-        System.setProperty("http.proxyUser", "leroyro1");
     }
 
     public long getApiCallCount() {
@@ -59,6 +57,10 @@ public class BattleNetClient {
         }
         return res;
     }
+    
+	public String getPersistantPath() {
+		return this.file.getPersistantPath();
+	}
     
     public BattleNetResponse getData(BattleNetType type, String realm, String name) throws IOException, URISyntaxException{
         BattleNetResponse res = mem.getData(type, realm, name);
@@ -94,5 +96,6 @@ public class BattleNetClient {
         }
         return res;
     }
+
 
 }

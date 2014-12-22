@@ -49,7 +49,7 @@ public class BattlenetAPIChecker {
     
     @Given("^required data exists in the file system$")
     public void required_data_exists_in_the_file_system() throws Throwable {
-        File f = new File("/users/leroyro1/perso/tmp/character/Sargeras/Pamynx.json");
+        File f = new File(client.getPersistantPath()+"/character/Sargeras/Pamynx.json");
         if (!f.exists()){
             f.createNewFile();
         }

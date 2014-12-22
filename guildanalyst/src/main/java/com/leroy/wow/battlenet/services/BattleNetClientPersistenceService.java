@@ -25,6 +25,10 @@ public class BattleNetClientPersistenceService {
         this.maxAge = maxAge;
     }
 
+	public String getPersistantPath() {
+		return this.root;
+	}
+    
     public BattleNetResponse getData(BattleNetType type, String realm, String name) throws IOException {
         BattleNetResponse res = null;
         String filePath = buildFilePath(type, realm, name);
