@@ -3,6 +3,7 @@ package com.leroy.wow.battlenet.services;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -50,8 +51,8 @@ public class BattleNetClientPersistenceService {
         Files.write(Paths.get(filePath), json.getBytes("utf-8"));
     }
     
-    private String buildFilePath(BattleNetType type, String realm, String name){
-        return root+"/"+type.name()+"/"+realm+"/"+name+".json";
+    private String buildFilePath(BattleNetType type, String realm, String name) throws UnsupportedEncodingException{
+        return root+"/"+type.name()+"/"+URLEncoder.encode(realm, "utf-8")+"/"+URLEncoder.encode(name, "utf-8")+".json";
     }
     
     private boolean isValid(File f) {

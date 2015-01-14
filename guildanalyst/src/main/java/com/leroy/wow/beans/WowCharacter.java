@@ -9,11 +9,14 @@ public class WowCharacter {
     private String name;
     private String realm;
     private String battlegroup;
+    private String guildName;
     
     private Long achievementPoints;
     
     private Long averageItemLevel;
     private Long averageItemLevelEquipped;
+    
+    private String mainName;
     
     public WowCharacter(String json) {
         super();
@@ -30,6 +33,11 @@ public class WowCharacter {
         if (items != null){
             averageItemLevel = (Long)items.get("averageItemLevel");
             averageItemLevelEquipped = (Long)items.get("averageItemLevelEquipped");
+        }
+        
+        JSONObject guild = (JSONObject)obj.get("guild");
+        if (guild != null){
+            this.guildName = (String)guild.get("name");
         }
     }
 
@@ -61,4 +69,15 @@ public class WowCharacter {
         return achievementPoints;
     }
 
+    public String getGuild() {
+        return guildName;
+    }
+    
+    public String getMainName() {
+        return mainName;
+    }
+
+    public void setMainName(String mainName) {
+        this.mainName = mainName;
+    }
 }

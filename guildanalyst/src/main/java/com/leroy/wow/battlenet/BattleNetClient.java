@@ -6,6 +6,12 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 
@@ -97,5 +103,44 @@ public class BattleNetClient {
         return res;
     }
 
+    public <T> Map<T, Set<WowCharacter>> getGuildMembersBy(String realm, String name, Function<WowCharacter, T> f) throws Exception{
+        WowGuild guild = this.getGuild(realm, name);
+        
+        Map<T, Set<WowCharacter>> res = new HashMap<T, Set<WowCharacter>>(){
+
+            @Override
+            public Set<WowCharacter> get(Object key) {
+                Set<WowCharacter> res = super.get(key);
+                if (res == null){
+                    res = new HashSet<WowCharacter>();
+                    this.put((T)key, res);
+                }
+                return res;
+            }
+            
+        };
+        
+        guild.getMembers()
+                .stream()
+                .map(member -> this.getSafeCharacter(member.getRealm(), member.getName()))
+                .filter(member -> member != null)
+                .forEach(character -> res.get(f.apply(character)).add(character))
+            ;
+        
+        return res;
+    }
+    
+    public String getMainName(String realm, String guild, Long achievementsPoints) throws Exception {
+        Map<Long, Set<WowCharacter>> membersByAchievementPoints = getGuildMembersBy(realm, guild, WowCharacter::getAchievementPoints);
+        String res = membersByAchievementPoints
+                            .get(achievementsPoints)
+                            .stream()
+                            .sorted(Comparator.comparing(c -> c.getRealm()+"-"+c.getName()))
+                            .sorted(Comparator.comparingLong(WowCharacter::getAverageItemLevel).reversed())
+                            .findFirst()
+                            .get()
+                            .getName();
+        return res;
+    }
 
 }

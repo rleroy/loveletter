@@ -68,6 +68,7 @@ public class BattlenetAPIChecker {
     @When("^I get the character data$")
     public void i_get_the_character_data() throws Throwable {
         this.character = client.getCharacter(realm, name);
+        this.character.setMainName(client.getMainName(realm, character.getGuild(), character.getAchievementPoints()));
     }
     
     @Then("^I get data$")
@@ -90,11 +91,10 @@ public class BattlenetAPIChecker {
     public void i_am_able_to_know_the_achievementPoints_of_this_character() throws Throwable {
         Assert.assertNotNull(this.character.getAchievementPoints());
     }
-    
+
     @Then("^I am able to know this character is a reroll of \"(.*?)\"$")
     public void i_am_able_to_know_this_character_is_a_reroll_of(String main) throws Throwable {
-        // TODO 
-        //Assert.assertEquals(main, this.character.getMainCharacter().getName());
+        Assert.assertEquals(main, character.getMainName());
     }
     
     @Then("^the API was only called once$")

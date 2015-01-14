@@ -7,7 +7,7 @@ import java.util.Set;
 public enum BattleNetType {
     
     guild("members"),
-    character("items"),
+    character("items", "guild"),
     ;
     
     private Set<String> fields;
