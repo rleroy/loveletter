@@ -26,4 +26,10 @@ Given realm name is "Sargeras"
 Given character name is "Aphykith"
  When I get the character data
  Then I am able to know this character is a reroll of "Pamynx" 
+
+Scenario: Accounts data
+Given realm name is "Sargeras"
+Given guild name is "La Meute"
+ When I get the accounts list
+ Then a main character is names "Pamynx" and have a reroll "Aphykith"
  
