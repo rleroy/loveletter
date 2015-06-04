@@ -9,6 +9,7 @@ import org.junit.Assert;
 import com.leroy.game.loveletter.LoveLetterRound;
 import com.leroy.game.loveletter.beans.Player;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -39,6 +40,11 @@ public class PlayARound {
         game.setupRound();
     }
 
+    @When("^\"(.*?)\" draws a card$")
+    public void draws_a_card(String name) throws Throwable {
+    	game.draw(name);
+    }
+
     @Then("^one of them should be the winner$")
     public void one_of_them_is_the_winner() throws Throwable {
         Player winner = game.getWinner();
@@ -65,4 +71,10 @@ public class PlayARound {
         Assert.assertEquals(nbCards, game.getPlayer(player).getHandSize());
         Assert.assertEquals(0, game.getPlayer(player).getDiscardedCards().size());
     }
+    
+    @Then("^\"(.*?)\" should have (\\d+) cards in hand$")
+    public void should_have_cards_in_hand(String player, int nbCards) throws Throwable {
+        Assert.assertEquals(nbCards, game.getPlayer(player).getHandSize());
+    }
+
 }

@@ -22,6 +22,11 @@ public class LoveLetterRound {
         return new LoveLetterRound(players);
     }
 
+	public void draw(String name) {
+		Player player = players.stream().filter(p -> name.equals(p.getName())).findAny().get();
+		this.draw(c -> player.draw(c));
+	}
+
     public void terminate() {
         // TODO Auto-generated method stub
     }
