@@ -107,4 +107,20 @@ public class LoveLetterRound {
         this.removedShownCards = new HashSet<>();
         this.deck = new ArrayList<>();
     }
+
+	public void play(String name) {
+		Player player = this.players.stream().filter(p -> name.equals(p.getName())).findFirst().get();
+		player.playCard();
+	}
+
+	public boolean isOver() {
+		// TODO Auto-generated method stub
+		return deck.isEmpty();
+	}
+
+	public void setupRound(String string) {
+		throw new RuntimeException("TODO");
+	}
+
+	
 }

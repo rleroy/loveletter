@@ -10,7 +10,7 @@ import cucumber.api.junit.Cucumber;
                  format={"pretty"},
                  monochrome=true,
                  strict=true
-                 //,tags = {"@tag"}
+                 ,tags = {"@wip"}
                 )
 public class RunTestsLoveLetter {
 

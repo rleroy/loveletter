@@ -11,6 +11,7 @@ public class Player {
     private Set<Card> hand;
     private List<Card> discard;
     
+    
     public Player(String name) {
         this.name = name;
         this.hand = new HashSet<>();
@@ -41,5 +42,10 @@ public class Player {
     public Object getHandSize() {
         return this.hand.size();
     }
+
+	public void playCard() {
+		Card c = this.hand.stream().findAny().get();
+		this.hand.remove(c);
+	}
 
 }
